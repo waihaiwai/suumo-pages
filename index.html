@@ -12,6 +12,7 @@
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
 
 #map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 1; }
+#panel-toggle { display: none; }
 
 #panel {
   position: absolute; top: 12px; right: 12px; z-index: 1000;
@@ -99,7 +100,12 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
 .marker-cluster { color: #fff; font-weight: 700; font-size: 12px; }
 
 @media (max-width: 600px) {
-  #panel { width: calc(100vw - 24px); max-height: 45vh; top: auto; bottom: 56px; right: 12px; font-size: 12px; }
+  #panel { width: calc(100vw - 24px); max-height: 45vh; top: auto; bottom: 56px; right: 12px; font-size: 12px; transition: transform 0.25s ease; }
+  #panel.collapsed { transform: translateY(calc(100% - 44px)); }
+  #panel.collapsed .panel-body { display: none; }
+  #panel-toggle { display: flex; align-items: center; justify-content: center; padding: 8px; cursor: pointer; font-size: 12px; font-weight: 600; color: #4A90D9; user-select: none; }
+  #panel-toggle::after { content: '▲'; margin-left: 6px; font-size: 10px; transition: transform 0.25s; }
+  #panel.collapsed #panel-toggle::after { transform: rotate(180deg); }
 }
 </style>
 </head>
@@ -107,7 +113,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
 
 <div id="map"></div>
 
-<div id="panel">
+<div id="panel" class="collapsed">
+  <div id="panel-toggle" onclick="document.getElementById('panel').classList.toggle('collapsed')">フィルター</div>
+  <div class="panel-body">
   <h1>SUUMO 物件マップ</h1>
   <div class="subtitle">2026-02-28 時点 · 1,926件 · <a href="dashboard.html">テーブルで見る →</a></div>
 
@@ -188,6 +196,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
       <div class="legend-item"><span class="legend-dot" style="background:#e74c3c"></span>7000万～</div>
     </div>
     <div style="font-size:10px;color:#999;margin-top:4px">円の大きさ＝物件数</div>
+  </div>
   </div>
 </div>
 
