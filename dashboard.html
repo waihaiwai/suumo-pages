@@ -81,6 +81,8 @@ a{color:#2563eb;text-decoration:none}a:hover{text-decoration:underline}
 <div class="chart-grid">
   <div class="card"><h3>区別件数 (Top 15)</h3><canvas id="wardChart"></canvas></div>
   <div class="card"><h3>価格帯分布</h3><canvas id="priceChart"></canvas></div>
+  <div class="card"><h3>築年数分布</h3><canvas id="ageChart"></canvas></div>
+  <div class="card"><h3>駅別件数 (Top 15)</h3><canvas id="stationChart"></canvas></div>
   <div class="card"><h3>割安度分布</h3><canvas id="valChart"></canvas></div>
   <div class="card"><h3>日別推移</h3><canvas id="trendChart"></canvas></div>
 </div>
@@ -379,6 +381,12 @@ let wardChart = new Chart(document.getElementById('wardChart'), {
 let priceChart = new Chart(document.getElementById('priceChart'), {
   type: 'bar', data: { labels:[], datasets:[{ data:[], backgroundColor:'#f59e0b' }] }, options: chartOpts
 });
+let ageChart = new Chart(document.getElementById('ageChart'), {
+  type: 'bar', data: { labels:[], datasets:[{ data:[], backgroundColor:'#8b5cf6' }] }, options: chartOpts
+});
+let stationChart = new Chart(document.getElementById('stationChart'), {
+  type: 'bar', data: { labels:[], datasets:[{ data:[], backgroundColor:'#06b6d4' }] }, options: { ...chartOpts, indexAxis: 'y' }
+});
 let valChart = new Chart(document.getElementById('valChart'), {
   type: 'doughnut',
   data: {
@@ -416,6 +424,29 @@ function updateCharts() {
   priceChart.data.labels = Object.keys(pBuckets);
   priceChart.data.datasets[0].data = Object.values(pBuckets);
   priceChart.update();
+
+  // Age distribution
+  const ageBuckets = {'~10':0,'10~20':0,'20~30':0,'30~40':0,'40~50':0,'50~':0};
+  filtered.forEach(r => {
+    if (r.age <= 0) return;
+    if (r.age <= 10) ageBuckets['~10']++;
+    else if (r.age <= 20) ageBuckets['10~20']++;
+    else if (r.age <= 30) ageBuckets['20~30']++;
+    else if (r.age <= 40) ageBuckets['30~40']++;
+    else if (r.age <= 50) ageBuckets['40~50']++;
+    else ageBuckets['50~']++;
+  });
+  ageChart.data.labels = Object.keys(ageBuckets);
+  ageChart.data.datasets[0].data = Object.values(ageBuckets);
+  ageChart.update();
+
+  // Station distribution
+  const stMap = {};
+  filtered.forEach(r => { if (r.station) stMap[r.station] = (stMap[r.station]||0) + 1; });
+  const stSorted = Object.entries(stMap).sort((a,b) => b[1]-a[1]).slice(0,15);
+  stationChart.data.labels = stSorted.map(s => s[0]);
+  stationChart.data.datasets[0].data = stSorted.map(s => s[1]);
+  stationChart.update();
 
   // Valuation distribution (from filtered data)
   // Map internal labels to display labels
