@@ -476,4 +476,15 @@ function resetFilter() {
   applyFilter();
 }
 
-// Enter key + select change triggers fi
+// Enter key + select change triggers filter
+document.querySelectorAll('#panel input, #panel select').forEach(el => {
+  el.addEventListener('keydown', e => { if (e.key === 'Enter') applyFilter(); });
+  if (el.tagName === 'SELECT') el.addEventListener('change', applyFilter);
+});
+document.getElementById('fNewOnly').addEventListener('change', applyFilter);
+
+// Initial render
+renderStationMarkers();
+</script>
+</body>
+</html>
